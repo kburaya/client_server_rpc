@@ -1,7 +1,7 @@
 .SUFFIXES:
 .SUFFIXES: .c .o
-CLNT = client
-SRVR = server
+CLNT = rpc_client
+SRVR = rpc_server
 CFLAGS = -g -Wall
 
 SRVR_OBJ = msg_svc_proc.o msg_svc.o
