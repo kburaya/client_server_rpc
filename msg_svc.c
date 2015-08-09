@@ -3,6 +3,12 @@
  * It was generated using rpcgen.
  * Server. Prodedures registration and start
  */
+#include <unistd.h>
+
+#include <sys/types.h>
+#include <sys/ioctl.h>
+#include <net/if.h>
+#include <arpa/inet.h>
 
 #include "msg.h"
 #include <stdio.h>
@@ -12,6 +18,7 @@
 #include <memory.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
+#include <syslog.h>
 
 #ifndef SIG_PF
 #define SIG_PF void(*)(int)
@@ -62,7 +69,24 @@ int
 main (int argc, char **argv)
 {
 	register SVCXPRT *transp;
-	
+	if(argc < 2) {
+		fprintf(stderr, "Check server name. Usage: ./server [servername]\n");
+		exit(1);
+	}
+	char *server;
+	server = argv[1];
+	//get local ip adress on eth0
+	int fd;
+ 	struct ifreq ifr;
+	fd = socket(AF_INET, SOCK_DGRAM, 0);
+
+	ifr.ifr_addr.sa_family = AF_INET;
+ 	strncpy(ifr.ifr_name, "eth0", IFNAMSIZ-1);
+	ioctl(fd, SIOCGIFADDR, &ifr);
+	close(fd);
+
+	openlog("rpc_client_server", 0, LOG_USER);
+	syslog(LOG_INFO, "server %s on ip %s started", server, inet_ntoa(((struct sockaddr_in *)&ifr.ifr_addr)->sin_addr));
 	pmap_unset (MESSAGEPROG, PRINTMESSAGETOCONSOLE);
 	transp = svcudp_create(RPC_ANYSOCK);
 	if (transp == NULL) {
