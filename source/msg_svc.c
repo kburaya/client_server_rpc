@@ -7,6 +7,10 @@
 
 #include <sys/types.h>
 #include <sys/ioctl.h>
+#include <sys/stat.h>
+#include <fcntl.h>
+#include <errno.h>
+#include <unistd.h>
 #include <net/if.h>
 #include <arpa/inet.h>
 
@@ -19,6 +23,8 @@
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <syslog.h>
+
+#define DAEMON_NAME "rpc_server_daemon"
 
 #ifndef SIG_PF
 #define SIG_PF void(*)(int)
@@ -85,9 +91,24 @@ main (int argc, char **argv)
 	ioctl(fd, SIOCGIFADDR, &ifr);
 	close(fd);
 
+	//fork off the parent process
+	pid_t pid, sid;
+	pid = fork();
+	if(pid < 0) {
+		exit(EXIT_FAILURE);
+	}
+	if(pid > 0) {
+		exit(EXIT_SUCCESS);
+	}
+
+	umask(0);
 	openlog("rpc_client_server", 0, LOG_USER);
 	syslog(LOG_INFO, "server %s on ip %s started", server, inet_ntoa(((struct sockaddr_in *)&ifr.ifr_addr)->sin_addr));
 	pmap_unset (MESSAGEPROG, PRINTMESSAGETOCONSOLE);
+
+	if((chdir("/")) < 0) {
+		exit(EXIT_FAILURE);
+	}
 	transp = svcudp_create(RPC_ANYSOCK);
 	if (transp == NULL) {
 		fprintf (stderr, "%s", "cannot create udp service.");
@@ -107,9 +128,10 @@ main (int argc, char **argv)
 		fprintf (stderr, "%s", "unable to register (MESSAGEPROG, PRINTMESSAGETOCONSOLE, tcp).");
 		exit(1);
 	}
-
-	svc_run ();
-	fprintf (stderr, "%s", "svc_run returned");
-	exit (1);
+	while(1) {
+		svc_run ();
+		fprintf (stderr, "%s", "svc_run returned");
+		exit (1);
+	}
 	/* NOTREACHED */
 }
