@@ -1,0 +1,5 @@
+<CONFIG>
+    <AGENT name="LOCAL">
+        <IF config="LOCAL_agent_config.xml" validator="agent_config_validator.py" service="rpc_server" scenario="LOCAL.test"/>
+    </AGENT>
+</CONFIG>

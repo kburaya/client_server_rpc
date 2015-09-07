@@ -1,0 +1,19 @@
+<CONFIG>
+<SP name="spa">
+<!-- HW -->
+    <PORT name="eth0"/>
+    <PORT name="eth1"/>
+<!-- SW -->
+<!--
+    <BOND name="bond0">
+        <PORT name="eth0"/>
+        <PORT name="eth1"/>
+    </BOND>
+-->
+    <NAMESPACE name="ns1">
+        <NAS name="nas_1">
+            <IF port="eth1" label="nas_1-if_1" ip="192.168.15.129" mask="255.255.255.0" vlan="111" gw="192.168.15.255"/>
+        </NAS>
+    </NAMESPACE>
+</SP>
+</CONFIG>
