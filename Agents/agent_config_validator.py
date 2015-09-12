@@ -25,7 +25,7 @@ default_cfg = '''
 -->
     <NAMESPACE name="ns1">
         <NAS name="nas_1">
-            <IF port="eth1" label="nas_1-if_1" ip="192.168.15.129" mask="255.255.255.0" vlan="111" gw="192.168.15.255"/>
+            <IF port="eth1" label="nas_1-if_1" ip="192.168.15.129" mask="255.255.255.0" vlan="111" gw="192.168.15.255" veth="veth1" br="br1"/>
         </NAS>
     </NAMESPACE>
     <NAMESPACE name="ns2">
@@ -87,7 +87,7 @@ def validate(node):
             ['name'],       # mandatory
             []              # optional
         ],
-        'BOND' : [
+        'SERVICE' : [
             ['PORT'],       # tags
             ['name'],       # mandatory
             []              # optional
@@ -105,7 +105,7 @@ def validate(node):
         'IF' : [
             [],                                 # tags
             ['port', 'ip', 'mask', 'vlan'],     # mandatory
-            ['label', 'gw']                     # optional
+            ['label', 'gw', 'veth', 'br']                     # optional
         ]
     }.get(node.tag)
 
@@ -140,6 +140,7 @@ def validate(node):
 def PrintUsage():
     print 'syntax: ' + sys.argv[0] + ' [ -c <config_file> | --cfg=<config_file> ] [ -a <application> | --app=<application> ]'
 
+
 def main(argv):
 
     global sm_cli_app   # allow modification of global var
@@ -149,6 +150,7 @@ def main(argv):
     except getopt.GetoptError:
         PrintUsage()
         sys.exit(2)
+
 
     cfg = ''
     for opt, arg in opts:
@@ -160,50 +162,56 @@ def main(argv):
         elif opt in ("-a", "--app"):
             sm_cli_app = arg
 
+    print cfg
     if cfg == '':
         config = ET.fromstring(default_cfg)
     else:
         config = ET.parse(cfg)
 
+    print config
     validate(config)
 
     namespaces = []
-    threads    = []
+
+    subprocess.check_call(['ip', 'link', 'set', 'dev', 'br-test', 'down'])
+    subprocess.check_call(['sudo', 'brctl', 'delbr', 'br-test'])
+
+    subprocess.check_call(['sudo', 'brctl', 'addbr', 'br-test'])
+    subprocess.check_call(['brctl', 'stp', 'br-test', 'off'])
+    subprocess.check_call(['ip', 'link', 'set', 'dev', 'br-test', 'up'])
 
     for sp in config.findall('SP'):
          print "SP=", sp.get('name')
          for ns in sp.findall('NAMESPACE'):
-            print "NS=", ns.get('name')
-            namespaces.append(ns)
+            name = ns.get('name')
+            for nas in ns.findall('NAS'):
+                params = nas.find('IF')
+                ip = params.attrib.get('ip')
+                veth = params.attrib.get('veth')
+                br = params.attrib.get('br')
+                print "NS %s params: %s, %s, %s" % (name, ip, veth, br)
+
+                subprocess.check_call(['ip', 'netns', 'add', name])
+                subprocess.check_call(['ip', 'link', 'add', veth, 'type', 'veth', 'peer', 'name', br])
+                subprocess.check_call(['brctl', 'addif', 'br-test', br])
+                subprocess.check_call(['ip', 'link', 'set', veth, 'netns', name])
+                subprocess.check_call(['ip', 'addr', 'add', ip, 'dev', 'br-test']) #!!!!!!!
+                subprocess.check_call(['ip', 'netns', 'exec', name, 'ip', 'addr', 'add', ip, 'dev', veth])
+                subprocess.check_call(['ip', 'link', 'set', br, 'up']) 
+                subprocess.check_call(['ip', 'netns', 'exec', name, 'ip', 'link', 'set', veth, 'up']) 
+                subprocess.check_call(['ip', 'netns', 'exec', name, 'ip', 'link', 'set', 'lo', 'up'])
+
+
+
+
 
     #start = time.time()
 
     # Initialize namespaces
-    for ns in namespaces:
-        init_ns(ns.get('name'))
+    #for ns in namespaces:
+    #    init_ns(ns.get('name'))
 
     print "NS initialization successfull"
-    # Create one thread per NAS
-    #for ns in namespaces:
-    #    for nas in ns.findall('NAS'):
-    #        t = NasThread(ns.get('name'), nas, 0)
-    #        threads.append(t)
-
-    # Start all threads
-    #for t in threads:
-    #    t.start()
-
-    # Wait for completion
-    #for t in threads:
-    #    t.join()
-
-    # Close namespaces
-    #for ns in namespaces:
-    #    close_ns(ns.get('name'))
-
-    #end = time.time()
-
-    #print "Execution time ", int(end - start), "s"
 
 ###################### script body ##############################
 

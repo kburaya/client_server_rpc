@@ -1,5 +1,31 @@
 <CONFIG>
-    <AGENT name="LOCAL">
-        <IF config="LOCAL_agent_config.xml" validator="agent_config_validator.py" service="rpc_server" scenario="LOCAL.test"/>
+    <AGENT name="StorageArray">
+        <IF machine="LOCAL" script="Agents/agent_config_validator.py" config="Agents/StorageArray.xml"/>
+        <PARAM name="StorageArray">
+            <SERVICE name="rpc_client"/>
+                <PORT name="eth0"/>
+                <NAMESPACE name="ns1">
+                    <NAS name="nas_1">
+                        <IF port="eth0" label="nas_1-if_1" ip="192.168.15.130" mask="255.255.255.0" vlan="111" gw="192.168.15.255" veth="veth1" br="br1"/>
+                    </NAS>
+                </NAMESPACE>
+                <NAMESPACE name="ns2">
+                    <NAS name="nas_1">
+                        <IF port="eth0" label="nas_1-if_12" ip="192.168.15.131" mask="255.255.255.0" vlan="111" gw="192.168.15.255" veth="veth2" br="br2"/>
+                    </NAS>
+                </NAMESPACE>
+        </PARAM>
     </AGENT>
+<!--     <AGENT name="Client11">
+        <IF machine="LOCAL" script="Agents/agent_config_validator.py" config="Agents/Client1_config.xml"/>
+        <PARAM name="Client1Params">
+                <PORT name="eth0"/>
+                <SERVICE name="rpc_client"/>
+                <NAMESPACE name="ns1">
+                    <NAS name="nas_1">
+                        <IF port="eth1" label="nas_1-if_1" ip="192.168.15.132" mask="255.255.255.0" vlan="111" gw="192.168.15.255"/>
+                    </NAS>
+                </NAMESPACE>
+        </PARAM>
+    </AGENT> -->
 </CONFIG>

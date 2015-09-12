@@ -14,38 +14,47 @@ def main(argv):
 		print "Usage is: python rpc_controller.py [controller config file]"
 		exit()
 	config = ET.parse(argv[0])
+	print argv[0]
 
-
-	for agent in config.findall('AGENT'):
-		agent_name = agent.get('name')
-		params = agent.find('IF')
-		agent_config = os.path.realpath(params.attrib.get('config'))
-		agent_path_to_validator = os.path.realpath(params.attrib.get('validator'))
-		agent_service_name = params.attrib.get('service')
-		agent_path_to_test = os.path.realpath(params.attrib.get('scenario'))
-		print "Agent name is '" + str(agent_name) + "'\nAgent config is '" + str(agent_config) + "'\nValidator file is '" + str(agent_path_to_validator) + "'\nService name is '" + str(agent_service_name) + "'\nTest case is '" + str(agent_path_to_test)
-
- 	try:
+	#if STAF doesn't work write these commands to cli
+	#export LD_LIBRARY_PATH="$LD_LIBRARY_PATH:/usr/local/staf/lib"
+	#export PATH=$PATH:$HOME/bin:/usr/local/staf/bin
+	
+	try:
 		handle = STAFHandle(__file__)
 	except STAFException, e:
 		print "Error registering with STAF, RC: %d" % e.rc
 		sys.exit(e.rc)
 
- 	result = handle.submit("local", "FS", "COPY FILE %s TODIRECTORY /tmp TOMACHINE %s" % 
- 	(STAFWrapData(agent_config), STAFWrapData(agent_name)))
- 	print result.rc
 
- 	result = handle.submit("local", "FS", "COPY FILE %s TODIRECTORY /tmp TOMACHINE %s" % 
- 	(STAFWrapData(agent_path_to_validator), STAFWrapData(agent_name)))
- 	print result.rc
+	for agent in config.findall('AGENT'):
+		agent_name = agent.get('name')
+		#Get agent properties
+		params = agent.find('IF')
+		#agent_xml_params = ET.tostring(agent.find('PARAM'))
+		agent_machine = params.attrib.get('machine')
+		agent_path_to_validator = os.path.realpath(params.attrib.get('script'))
+		agent_config_file = os.path.realpath(params.attrib.get('config'))
 
- 	result = handle.submit("local", "FS", "COPY FILE %s TODIRECTORY /tmp TOMACHINE %s" % 
- 	(STAFWrapData(agent_path_to_test), STAFWrapData(agent_name)))
- 	print result.rc
+		#Agent info input
+		print "Agent name is '" + str(agent_name) + "'\nAgent machine is '" + str(agent_machine) + "'\nValidator file is '" + str(agent_path_to_validator)
+		#print "Agent xml commands is '" + str(agent_xml_params)
 
- 	command_str = "python rpc_agent.py " + str(agent_name) + " " + str(agent_service_name)
- 	print command_str
- 	result = handle.submit(str(agent_name), "PROCESS", "START SHELL COMMAND %s WAIT RETURNSTDOUT" % STAFWrapData(command_str))
+		#Send validator script to agent machine
+ 		result = handle.submit("local", "FS", "COPY FILE %s TODIRECTORY /tmp TOMACHINE %s" % 
+ 		(STAFWrapData(agent_path_to_validator), STAFWrapData(agent_machine)))
+ 		print result.rc
+
+ 		#Send agent cofig to agent machine
+ 		result = handle.submit("local", "FS", "COPY FILE %s TODIRECTORY /tmp TOMACHINE %s" % 
+ 		(STAFWrapData(agent_config_file), STAFWrapData(agent_machine)))
+ 		print result.rc
+ 		#Send config file for agent
+
+ 		command_str = "python rpc_agent.py -c /tmp/" + str(agent_name) + ".xml"
+ 		print command_str
+ 		result = handle.submit(str(agent_machine), "PROCESS", "START SHELL COMMAND %s WAIT STDERRTOSTDOUT RETURNSTDOUT" % (STAFWrapData(command_str)))
+ 		print result.rc
 
 	handle.unregister()
 
