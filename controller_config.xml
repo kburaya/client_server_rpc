@@ -3,17 +3,17 @@
         <IF machine="LOCAL" script="Agents/agent_config_validator.py" config="Agents/StorageArray.xml"/>
         <PARAM name="StorageArray">
             <SERVICE name="rpc_client"/>
-                <PORT name="eth0"/>
-                <NAMESPACE name="ns1">
-                    <NAS name="nas_1">
-                        <IF port="eth0" label="nas_1-if_1" ip="192.168.15.130" mask="255.255.255.0" vlan="111" gw="192.168.15.255" veth="veth1" br="br1"/>
-                    </NAS>
-                </NAMESPACE>
-                <NAMESPACE name="ns2">
-                    <NAS name="nas_1">
-                        <IF port="eth0" label="nas_1-if_12" ip="192.168.15.131" mask="255.255.255.0" vlan="111" gw="192.168.15.255" veth="veth2" br="br2"/>
-                    </NAS>
-                </NAMESPACE>
+            <PORT name="eth0"/>
+            <NAMESPACE name="ns1">
+                <NAS name="nas_1">
+                    <IF port="eth0" label="nas_1-if_1" ip="192.168.15.130" mask="255.255.255.0" vlan="111" gw="192.168.15.255"/>
+                </NAS>
+            </NAMESPACE>
+            <NAMESPACE name="ns2">
+                <NAS name="nas_1">
+                    <IF port="eth0" label="nas_1-if_12" ip="192.168.15.131" mask="255.255.255.0" vlan="111" gw="192.168.15.255"/>
+                </NAS>
+            </NAMESPACE>
         </PARAM>
     </AGENT>
 <!--     <AGENT name="Client11">
