@@ -105,7 +105,7 @@ def validate(node):
         'IF' : [
             [],                                 # tags
             ['port', 'ip', 'mask', 'vlan'],     # mandatory
-            ['label', 'gw', 'veth', 'br']                     # optional
+            ['label', 'gw']                     # optional
         ]
     }.get(node.tag)
 
@@ -138,8 +138,7 @@ def validate(node):
 #----------------------------------------------------------------
 
 def PrintUsage():
-    print 'syntax: ' + sys.argv[0] + ' [ -c <config_file> | --cfg=<config_file> ] [ -a <application> | --app=<application> ]'
-
+    print 'syntax: ' + sys.argv[0] + ' [ -c <config_file> | --cfg=<config_file> ] [ -a <application> | --app=<application> ]'    
 
 def main(argv):
 
@@ -171,14 +170,10 @@ def main(argv):
     print config
     validate(config)
 
-    namespaces = []
-
-    subprocess.check_call(['ip', 'link', 'set', 'dev', 'br-test', 'down'])
-    subprocess.check_call(['sudo', 'brctl', 'delbr', 'br-test'])
-
-    subprocess.check_call(['sudo', 'brctl', 'addbr', 'br-test'])
-    subprocess.check_call(['brctl', 'stp', 'br-test', 'off'])
-    subprocess.check_call(['ip', 'link', 'set', 'dev', 'br-test', 'up'])
+    namespaces = [] 
+    
+    sp = subprocess.Popen(['python', 'ns_config.py', '-br', 'br-rpctest', '192.168.16.29/24'], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    out, err = sp.communicate()
 
     for sp in config.findall('SP'):
          print "SP=", sp.get('name')
@@ -187,19 +182,8 @@ def main(argv):
             for nas in ns.findall('NAS'):
                 params = nas.find('IF')
                 ip = params.attrib.get('ip')
-                veth = params.attrib.get('veth')
-                br = params.attrib.get('br')
-                print "NS %s params: %s, %s, %s" % (name, ip, veth, br)
-
-                subprocess.check_call(['ip', 'netns', 'add', name])
-                subprocess.check_call(['ip', 'link', 'add', veth, 'type', 'veth', 'peer', 'name', br])
-                subprocess.check_call(['brctl', 'addif', 'br-test', br])
-                subprocess.check_call(['ip', 'link', 'set', veth, 'netns', name])
-                subprocess.check_call(['ip', 'addr', 'add', ip, 'dev', 'br-test']) #!!!!!!!
-                subprocess.check_call(['ip', 'netns', 'exec', name, 'ip', 'addr', 'add', ip, 'dev', veth])
-                subprocess.check_call(['ip', 'link', 'set', br, 'up']) 
-                subprocess.check_call(['ip', 'netns', 'exec', name, 'ip', 'link', 'set', veth, 'up']) 
-                subprocess.check_call(['ip', 'netns', 'exec', name, 'ip', 'link', 'set', 'lo', 'up'])
+                print "NS %s params: %s" % (name, ip)
+                subprocess.check_call(['python', 'ns_config.py', '-ns', name, ip])
 
 
 

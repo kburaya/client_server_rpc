@@ -3,12 +3,12 @@
     <PORT name="eth0"/>
     <NAMESPACE name="ns1">
         <NAS name="nas_1">
-            <IF port="eth1" label="nas_1-if_1" ip="192.168.15.135/24" mask="255.255.255.0" vlan="111" gw="192.168.15.255" veth="veth1" br="br1"/>
+            <IF port="eth1" label="nas_1-if_1" ip="192.168.16.135" mask="255.255.255.0" vlan="111" gw="192.168.15.255"/>
         </NAS>
     </NAMESPACE>
     <NAMESPACE name="ns2">
         <NAS name="nas_3">
-            <IF port="eth1" label="nas_1-if_1" ip="192.168.15.136/24" mask="255.255.255.0" vlan="111" gw="192.168.15.255" veth="veth2" br="br2"/>
+            <IF port="eth1" label="nas_1-if_1" ip="192.168.16.136" mask="255.255.255.0" vlan="111" gw="192.168.15.255"/>
         </NAS>
     </NAMESPACE>
 </SP>
