@@ -51,10 +51,12 @@ def main(argv):
  		print result.rc
  		#Send config file for agent
 
- 		command_str = "python rpc_agent.py -c /tmp/" + str(agent_name) + ".xml"
- 		print command_str
- 		result = handle.submit(str(agent_machine), "PROCESS", "START SHELL COMMAND %s WAIT STDERRTOSTDOUT RETURNSTDOUT" % (STAFWrapData(command_str)))
- 		print result.rc
+ 		sp = subprocess.Popen(['python', 'Agents/agent_config_validator.py', '-c', agent_config_file], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+ 		out, err = sp.communicate()
+ 		print err
+ 		print out
+ 		#result = handle.submit(str(agent_machine), "PROCESS", "START SHELL COMMAND %s WAIT STDERRTOSTDOUT RETURNSTDOUT" % (STAFWrapData(command_str)))
+ 		#print result.rc
 
 	handle.unregister()
 
