@@ -152,10 +152,19 @@ def main(argv):
     print "TestCase begin"
 
    	#TestCase Begin
-    sp = subprocess.Popen(["sudo python rpcbind_test.py ns1 start"], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    sp = subprocess.Popen(['sudo', './Agents/StorageArray.sh'], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     out, err = sp.communicate()
     print out
     print err
+
+
+    #TestCase End
+    for sp in config.findall('SP'):
+         #print "SP=", sp.get('name')
+         for ns in sp.findall('NAMESPACE'):
+            name = ns.get('name')
+            subprocess.check_call(['sudo', 'ip', 'netns', 'del', name])
+
 
 ###################### script body ##############################
 

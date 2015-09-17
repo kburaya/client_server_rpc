@@ -6,11 +6,10 @@ import re
 import sys
 import signal
 import subprocess
-from subprocess import check_output
 
 
 def get_pid(name):
-    return int(check_output(["pidof","-s",name]))
+    return int(subprosess.check_output(["pidof","-s",name]))
 
 if (len(sys.argv) == 3):
 	nsname = sys.argv[1]
