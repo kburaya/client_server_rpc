@@ -10,49 +10,6 @@ import getopt
 # Global vars
 sm_cli_app  = 'sm_client_c_mt_lua_cli'
 
-# default_cfg = '''
-# <CONFIG>
-# <SP name="spa">
-# <!-- HW -->
-#     <PORT name="eth0"/>
-#     <PORT name="eth1"/>
-# <!-- SW -->
-# <!--
-#     <BOND name="bond0">
-#         <PORT name="eth0"/>
-#         <PORT name="eth1"/>
-#     </BOND>
-# -->
-#     <NAMESPACE name="ns1">
-#         <NAS name="nas_1">
-#             <IF port="eth1" label="nas_1-if_1" ip="192.168.15.129" mask="255.255.255.0" vlan="111" gw="192.168.15.255" veth="veth1" br="br1"/>
-#         </NAS>
-#     </NAMESPACE>
-#     <NAMESPACE name="ns2">
-#         <NAS name="nas_3">
-#             <IF port="eth1" label="nas_1-if_1" ip="192.168.15.130" mask="255.255.255.0" vlan="111" gw="192.168.15.255"/>
-#         </NAS>
-#     </NAMESPACE>
-# </SP>
-# </CONFIG>
-# '''
-
-#-------------------------------------------------------------------
-# sm_init_ns --ns <namespace>
-
-def init_ns(ns):
-    if ns != '':
-        run_cli(['sm_init_ns', '--ns', ns])
-
-#-------------------------------------------------------------------
-# sm_close_ns --ns <namespace>
-
-def close_ns(ns):
-    if ns != '':
-        run_cli(['sm_close_ns', '--ns', ns])
-
-
-
 #-------------------------------------------------------------------
 def tostring(node):
     result = "<" + node.tag
@@ -172,6 +129,7 @@ def main(argv):
 
     namespaces = [] 
     
+
     sp = subprocess.Popen(['python', 'Agents/ns_config.py', '-br', 'br-rpctest', '192.168.16.29/24'], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     out, err = sp.communicate()
 
@@ -184,11 +142,6 @@ def main(argv):
                 ip = params.attrib.get('ip')
                 #print "NS %s params: %s" % (name, ip)
                 subprocess.check_call(['python', 'Agents/ns_config.py', '-ns', name, ip])
-
-
-
-
-
     #start = time.time()
 
     # Initialize namespaces
@@ -196,6 +149,13 @@ def main(argv):
     #    init_ns(ns.get('name'))
 
     print "NS initialization successfull"
+    print "TestCase begin"
+
+   	#TestCase Begin
+    sp = subprocess.Popen(["sudo python rpcbind_test.py ns1 start"], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    out, err = sp.communicate()
+    print out
+    print err
 
 ###################### script body ##############################
 
