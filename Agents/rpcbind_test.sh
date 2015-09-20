@@ -19,7 +19,7 @@ add_mount() {
 # del_mount <ns> <ext>
 del_mount() {
     umount $MOUNT_SRC/$1.$2 2> /dev/null
-    rm $MOUNT_SRC/$1.$2
+    #rm $MOUNT_SRC/$1.$2
 }
 
 start_in_ns() {

@@ -151,7 +151,7 @@ def main(argv):
     print "NS initialization successfull"
     print "TestCase begin"
 
-   	#TestCase Begin
+    exit(1)
     sp = subprocess.Popen(['sudo', './Agents/StorageArray.sh'], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     out, err = sp.communicate()
     print out
