@@ -152,7 +152,7 @@ def main(argv):
     print "TestCase begin"
 
     #exit(1)
-    
+
     sp = subprocess.Popen(['sudo', './Agents/StorageArray.sh'], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     out, err = sp.communicate()
     print out
