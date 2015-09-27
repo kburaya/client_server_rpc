@@ -71,7 +71,7 @@ case "$op" in
         ;;
     "stop")
         ip netns exec "$ns" $0 "$ns" stop-in-ns
-        #ip netns del "$ns"
+        ip netns del "$ns"
         ;;
     "start-in-ns")
         start_in_ns "$ns"

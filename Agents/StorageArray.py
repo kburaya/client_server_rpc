@@ -130,9 +130,10 @@ def main(argv):
     namespaces = [] 
     
 
-    sp = subprocess.Popen(['python', 'Agents/ns_config.py', '-br', 'br-rpctest', '192.168.16.29/24'], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    sp = subprocess.Popen(['python', 'Agents/vethconf.py', '-br', 'br-rpctest', '192.168.16.29/24'], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     out, err = sp.communicate()
 
+    #namespace inizialisation + run rpc_servers in each namespaces
     for sp in config.findall('SP'):
          #print "SP=", sp.get('name')
          for ns in sp.findall('NAMESPACE'):
@@ -141,22 +142,15 @@ def main(argv):
                 params = nas.find('IF')
                 ip = params.attrib.get('ip')
                 #print "NS %s params: %s" % (name, ip)
-                subprocess.check_call(['python', 'Agents/ns_config.py', '-ns', name, ip])
-    #start = time.time()
-
-    # Initialize namespaces
-    #for ns in namespaces:
-    #    init_ns(ns.get('name'))
-
+                subprocess.check_call(['sudo', './Agents/nsconfig.sh', name, 'start'])
+                subprocess.check_call(['sudo', 'python', 'Agents/vethconf.py', '-ns', name, ip])
+                #subprocess.check_call(['sudo', 'ip', 'netns', 'exec', name, './Client_Server_Source/rpc_server', name, '&'])
+    
     print "NS initialization successfull"
     print "TestCase begin"
 
-    #exit(1)
-
-    sp = subprocess.Popen(['sudo', './Agents/StorageArray.sh'], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-    out, err = sp.communicate()
-    print out
-    print err
+    #TestCase scenario
+    exit(1)
 
 
     #TestCase End
@@ -164,7 +158,7 @@ def main(argv):
          #print "SP=", sp.get('name')
          for ns in sp.findall('NAMESPACE'):
             name = ns.get('name')
-            subprocess.check_call(['sudo', 'ip', 'netns', 'del', name])
+            subprocess.check_call(['sudo', './Agents/nsconfig.sh', name, 'stop'])
 
 
 ###################### script body ##############################

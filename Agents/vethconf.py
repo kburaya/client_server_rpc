@@ -19,7 +19,7 @@ def crt_veth(ns, ip):
     veth = "veth" + str(ns)
     br = "br" + str(ns)
     ip = ip + str("/24")
-    subprocess.check_call(['ip', 'netns', 'add', ns])
+    #subprocess.check_call(['ip', 'netns', 'add', ns])
     subprocess.check_call(['ip', 'link', 'add', veth, 'type', 'veth', 'peer', 'name', br])
     subprocess.check_call(['brctl', 'addif', 'br-rpctest', br])
     subprocess.check_call(['ip', 'link', 'set', veth, 'netns', ns])
@@ -31,7 +31,7 @@ def crt_veth(ns, ip):
 
 def main(argv):
 	if(len(argv) != 3):
-		print "Script usage: ns_config.py -ns/-br [NS/BRIDGE] [NS/BRIDGE ip]"
+		print "Script usage: vethconf.py -ns/-br [NS/BRIDGE] [NS/BRIDGE ip]"
 		exit(1)
 
 	if(argv[0] == "-ns"):
