@@ -73,6 +73,7 @@ main (int argc, char **argv)
 		fprintf(stderr, "Check server name. Usage: ./server [servername]\n");
 		exit(1);
 	}
+	
 	char *server;
 	server = argv[1];
 	//get local ip adress on eth0
@@ -86,7 +87,7 @@ main (int argc, char **argv)
 	close(fd);
 
 	openlog("rpc_client_server", 0, LOG_USER);
-	syslog(LOG_INFO, "server %s on ip %s started", server, inet_ntoa(((struct sockaddr_in *)&ifr.ifr_addr)->sin_addr));
+	syslog(LOG_INFO, "service_1 %s on ip %s started", server, inet_ntoa(((struct sockaddr_in *)&ifr.ifr_addr)->sin_addr));
 	pmap_unset (MESSAGEPROG, PRINTMESSAGETOCONSOLE);
 	transp = svcudp_create(RPC_ANYSOCK);
 	if (transp == NULL) {

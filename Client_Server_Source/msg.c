@@ -26,6 +26,9 @@ main(argc, argv)
 	syslog(LOG_INFO, "connection to server %s", server);
 	syslog(LOG_INFO, "client message is %s", message);
 
+	//printf("connection to server %s\n", server);
+	//printf("client message is %s\n", message);
+
 
 	clnt = clnt_create(server, MESSAGEPROG, PRINTMESSAGETOCONSOLE, "tcp");
 	if (clnt == (CLIENT *)NULL) {
@@ -38,15 +41,18 @@ main(argc, argv)
 	result = printmessage_1(&message, clnt);
 	if (result == (int *)NULL) {
 		syslog(LOG_INFO, "an error occured while calling the server, aborting");
+		//printf("client create error\n");
 		clnt_perror(clnt, server);
 		exit(1);
 	}
 	if (*result == 0) {
+		syslog(LOG_INFO, "%s: could not print your message\n",argv[0]);
 		fprintf(stderr,"%s: could not print your message\n",argv[0]);
 		exit(1);
 	}
 
  	syslog(LOG_INFO, "message successfully delivered to server %s", server);
+ 	//printf("message successfully delivered to server %s\n", server)
 	clnt_destroy( clnt );
 	exit(0);
 }
