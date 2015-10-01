@@ -153,7 +153,7 @@ main (int argc, char **argv)
 {
 	register SVCXPRT *transp;
 	if(argc != 4) {
-		fprintf(stderr, "usage: %s [server name] [service number - 1/2/3] [protocol - udp/tcp]\n", argv[0]);
+		fprintf(stderr, "usage: %s [server name] [service number - 1/2/3] [protocol - udp/tcp/all]\n", argv[0]);
 		exit(1);
 	}
 	char *server;
@@ -183,7 +183,7 @@ main (int argc, char **argv)
 		syslog(LOG_INFO, "service [%s] mapped", service);
 	}
 
-	if(strcmp(protocol, "udp") == 0) {
+	if((strcmp(protocol, "udp") == 0) || (strcmp(protocol, "all") == 0)) {
 		transp = svcudp_create(RPC_ANYSOCK);
 		if (transp == NULL) {
 			fprintf (stderr, "%s", "cannot create udp service.");
@@ -212,7 +212,7 @@ main (int argc, char **argv)
 		}
 	}
 
-	else if(strcmp(protocol, "tcp") == 0) {
+	else if((strcmp(protocol, "tcp") == 0) || (strcmp(protocol, "all") == 0))  {
 		transp = svctcp_create(RPC_ANYSOCK, 0, 0);
 		if (transp == NULL) {
 			fprintf (stderr, "%s", "cannot create tcp service.");
