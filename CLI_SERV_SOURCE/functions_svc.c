@@ -19,7 +19,6 @@
 #include <errno.h>
 #include <unistd.h>
 
-
 #ifndef SIG_PF
 #define SIG_PF void(*)(int)
 #endif
@@ -153,19 +152,21 @@ int
 main (int argc, char **argv)
 {
 	register SVCXPRT *transp;
-	if(argc != 3) {
-		fprintf(stderr, "usage: %s [server name] [service number - 1/2/3]\n", argv[0]);
+	if(argc != 4) {
+		fprintf(stderr, "usage: %s [server name] [service number - 1/2/3] [protocol - udp/tcp]\n", argv[0]);
 		exit(1);
 	}
 	char *server;
 	char *service;
+	char *protocol;
 
 
 	server = argv[1];
 	service = argv[2];
+	protocol = argv[3];
 
 	openlog("rpc_client_server", 0, LOG_USER);
-	syslog(LOG_INFO, "server [%s] started with service [%s]", server, service);
+	syslog(LOG_INFO, "server [%s] started with service [%s] with protocol [%s]", server, service, protocol);
 
 
 
@@ -182,60 +183,75 @@ main (int argc, char **argv)
 		syslog(LOG_INFO, "service [%s] mapped", service);
 	}
 
-	transp = svcudp_create(RPC_ANYSOCK);
-	if (transp == NULL) {
-		fprintf (stderr, "%s", "cannot create udp service.");
-		exit(1);
-	}
-	if (strcmp(service, "service_1") == 0) {
-		if(!svc_register(transp, SERVICE_1, PRINTMSG_1, service_1_1, IPPROTO_UDP)) {
-			syslog(LOG_INFO, "Try to regicter service [%s] on UDP", service);
-			fprintf (stderr, "%s", "unable to register (SERVICE_1, PRINTMSG_1, udp).");
+	if(strcmp(protocol, "udp") == 0) {
+		transp = svcudp_create(RPC_ANYSOCK);
+		if (transp == NULL) {
+			fprintf (stderr, "%s", "cannot create udp service.");
 			exit(1);
 		}
-	}
-	if (strcmp(service, "service_2") == 0) {
-		if(!svc_register(transp, SERVICE_2, PRINTMSG_2, service_2_1, IPPROTO_UDP)) {
-			syslog(LOG_INFO, "Try to regicter service [%s] on UDP", service);
-			fprintf (stderr, "%s", "unable to register (SERVICE_2, PRINTMSG_2, udp).");
-			exit(1);
+		if (strcmp(service, "service_1") == 0) {
+			if(!svc_register(transp, SERVICE_1, PRINTMSG_1, service_1_1, IPPROTO_UDP)) {
+				syslog(LOG_INFO, "Try to regicter service [%s] on UDP", service);
+				fprintf (stderr, "%s", "unable to register (SERVICE_1, PRINTMSG_1, udp).");
+				exit(1);
+			}
+		}
+		if (strcmp(service, "service_2") == 0) {
+			if(!svc_register(transp, SERVICE_2, PRINTMSG_2, service_2_1, IPPROTO_UDP)) {
+				syslog(LOG_INFO, "Try to regicter service [%s] on UDP", service);
+				fprintf (stderr, "%s", "unable to register (SERVICE_2, PRINTMSG_2, udp).");
+				exit(1);
+			}
+		}
+		if (strcmp(service, "service_3") == 0) {
+			if(!svc_register(transp, SERVICE_3, PRINTMSG_3, service_3_1, IPPROTO_UDP)) {
+				syslog(LOG_INFO, "Try to regicter service [%s] on UDP", service);
+				fprintf (stderr, "%s", "unable to register (SERVICE_3, PRINTMSG_3, udp).");
+				exit(1);
+			}
 		}
 	}
-	if (strcmp(service, "service_3") == 0) {
-		if(!svc_register(transp, SERVICE_3, PRINTMSG_3, service_3_1, IPPROTO_UDP)) {
-			syslog(LOG_INFO, "Try to regicter service [%s] on UDP", service);
-			fprintf (stderr, "%s", "unable to register (SERVICE_3, PRINTMSG_3, udp).");
+
+	else if(strcmp(protocol, "tcp") == 0) {
+		transp = svctcp_create(RPC_ANYSOCK, 0, 0);
+		if (transp == NULL) {
+			fprintf (stderr, "%s", "cannot create tcp service.");
 			exit(1);
+		}
+		if ((strcmp(service, "service_1") == 0)) {
+			if(!svc_register(transp, SERVICE_1, PRINTMSG_1, service_1_1, IPPROTO_TCP)) {
+				fprintf (stderr, "%s", "unable to register (SERVICE_1, PRINTMSG_1, tcp).");
+				exit(1);
+			}
+		}
+		if (strcmp(service, "service_2") == 0) {
+			if(!svc_register(transp, SERVICE_2, PRINTMSG_2, service_2_1, IPPROTO_TCP)) {
+				fprintf (stderr, "%s", "unable to register (SERVICE_2, PRINTMSG_2, tcp).");
+				exit(1);
+			}
+		}
+		if ((strcmp(service, "service_3") == 0)) {
+			if(!svc_register(transp, SERVICE_3, PRINTMSG_3, service_3_1, IPPROTO_TCP)) {
+				fprintf (stderr, "%s", "unable to register (SERVICE_3, PRINTMSG_3, tcp).");
+				exit(1);
+			}
 		}
 	}
 
 
-	transp = svctcp_create(RPC_ANYSOCK, 0, 0);
-	if (transp == NULL) {
-		fprintf (stderr, "%s", "cannot create tcp service.");
-		exit(1);
-	}
-	if ((strcmp(service, "service_1") == 0)) {
-		if(!svc_register(transp, SERVICE_1, PRINTMSG_1, service_1_1, IPPROTO_TCP)) {
-			fprintf (stderr, "%s", "unable to register (SERVICE_1, PRINTMSG_1, tcp).");
-			exit(1);
-		}
-	}
-	if (strcmp(service, "service_2") == 0) {
-		if(!svc_register(transp, SERVICE_2, PRINTMSG_2, service_2_1, IPPROTO_TCP)) {
-			fprintf (stderr, "%s", "unable to register (SERVICE_2, PRINTMSG_2, tcp).");
-			exit(1);
-		}
-	}
-	if ((strcmp(service, "service_3") == 0)) {
-		if(!svc_register(transp, SERVICE_3, PRINTMSG_3, service_3_1, IPPROTO_TCP)) {
-			fprintf (stderr, "%s", "unable to register (SERVICE_3, PRINTMSG_3, tcp).");
-			exit(1);
-		}
-	}
+	pid_t pid, sid;
+	pid = fork();
+    if (pid < 0) {
+        exit(EXIT_FAILURE);
+    }
 
-	svc_run ();
-	fprintf (stderr, "%s", "svc_run returned");
-	exit (1);
+   	else if (pid > 0) {
+        exit(EXIT_SUCCESS);
+    }
+    else {
+    	svc_run ();
+		fprintf (stderr, "%s", "svc_run returned");
+		exit (1);
+	}
 	/* NOTREACHED */
 }
