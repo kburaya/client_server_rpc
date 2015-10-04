@@ -70,7 +70,7 @@ ip netns add ns2
 python Agents/vethconf.py -ns ns2 192.168.16.136
 ./Agents/nsconfig.sh ns2 start
 
-#!!!!!!!!CRUSHES HERE!!!!!!!!!!!
+#SLES 12 CRASHES HERE (can't register serice error)
 
 echo "run service_1 in ns2"
 #run service_1 in ns2
@@ -82,6 +82,8 @@ echo "test connections"
 ./CLI_SERV_SOURCE/rpc_client 192.168.16.135 service_2 "client from ns1 - service_2"
 ./CLI_SERV_SOURCE/rpc_client 192.168.16.135 service_3 "client from ns1 - service_3"
 
+
+#SLES 11 CRASHES HERE (can't access service error)
 ./CLI_SERV_SOURCE/rpc_client 192.168.16.136 service_1 "client from ns2 - service_1"
 
 ./CLI_SERV_SOURCE/rpc_client 192.168.16.137 service_1 "client from ns3 - service_1"
