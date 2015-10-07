@@ -1,0 +1,3 @@
+<CONFIG>
+    <AGENT name="StorageArray" machine="LOCAL" script="Agents/StorageArray.py" config="Configs/StorageArray_3ns.xml"/>
+</CONFIG>

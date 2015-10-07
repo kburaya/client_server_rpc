@@ -1,5 +1,0 @@
-<CONFIG>
-    <AGENT name="StorageArray" machine="LOCAL" script="Agents/StorageArray.py" config="Configs/StorageArray.xml"/>
-    <AGENT name="Agent1" machine="LOCAL" script="Agents/Agent1.sh"/>
-    <AGENT name="Agent2" machine="LOCAL" script="Agents/Agent2.sh"/>
-</CONFIG>
