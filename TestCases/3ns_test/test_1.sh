@@ -5,11 +5,11 @@
 
 
 echo "Start service1 in ns1,2,3"
-ip netns exec ns1 ./CLI_SERV_SOURCE/rpc_server srv_ns1 service_1 tcp
+ip netns exec ns1 ./CLI_SERV_SOURCE/rpc_server srv_ns1 service_1 $1
 sleep 2
-ip netns exec ns2 ./CLI_SERV_SOURCE/rpc_server srv_ns2 service_1 tcp
+ip netns exec ns2 ./CLI_SERV_SOURCE/rpc_server srv_ns2 service_1 $1
 sleep 2
-ip netns exec ns3 ./CLI_SERV_SOURCE/rpc_server srv_ns3 service_1 tcp
+ip netns exec ns3 ./CLI_SERV_SOURCE/rpc_server srv_ns3 service_1 $1
 sleep 2
 
 
@@ -32,7 +32,7 @@ python Agents/vethconf.py -ns ns1 192.168.16.135
 ./Agents/nsconfig.sh ns1 start
 
 echo "Run service_2 in ns1"
-ip netns exec ns1 ./CLI_SERV_SOURCE/rpc_server srv_ns1 service_2 tcp
+ip netns exec ns1 ./CLI_SERV_SOURCE/rpc_server srv_ns1 service_2 $1
 sleep 2
 
 echo "Test connections: ns1 - service2, ns2 - service1, ns3 - service1"
@@ -41,7 +41,7 @@ echo "Test connections: ns1 - service2, ns2 - service1, ns3 - service1"
 ./CLI_SERV_SOURCE/rpc_client 192.168.16.137 service_1 "client from ns3 - service_1"
 
 echo "Run service_3 in ns1"
-ip netns exec ns1 ./CLI_SERV_SOURCE/rpc_server srv_ns1 service_3 tcp
+ip netns exec ns1 ./CLI_SERV_SOURCE/rpc_server srv_ns1 service_3 $1
 sleep 2
 
 echo "Test connections: ns1 - service2, ns1 - service3, ns2 - service1, ns3 - service1"
@@ -67,7 +67,7 @@ python Agents/vethconf.py -ns ns2 192.168.16.136
 
 
 echo "Run service_1 in ns2"
-ip netns exec ns2 ./CLI_SERV_SOURCE/rpc_server srv_ns2 service_1 tcp
+ip netns exec ns2 ./CLI_SERV_SOURCE/rpc_server srv_ns2 service_1 $1
 sleep 2
 
 echo "Test connections: ns1 - service2, ns1 - service3, ns2 - service2, ns3 - service1"

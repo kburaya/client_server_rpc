@@ -3,10 +3,12 @@
 #ns2 - 192.168.16.136
 #success test
 
+python Agents/StorageArray.py -c Configs/StorageArray_2ns.xml
+
 echo "Run service1 in NS 1, 2"
-ip netns exec ns1 ./CLI_SERV_SOURCE/rpc_server srv_ns1 service_1 tcp
+ip netns exec ns1 ./CLI_SERV_SOURCE/rpc_server srv_ns1 service_1 $1
 sleep 2
-ip netns exec ns2 ./CLI_SERV_SOURCE/rpc_server srv_ns2 service_1 tcp
+ip netns exec ns2 ./CLI_SERV_SOURCE/rpc_server srv_ns2 service_1 $1
 sleep 2
 
 echo "Test connections: ns1 - service1, ns2 - servive"
@@ -27,7 +29,7 @@ python Agents/vethconf.py -ns ns1 192.168.16.135
 ./Agents/nsconfig.sh ns1 start
 
 echo "Start service2 in ns1"
-ip netns exec ns1 ./CLI_SERV_SOURCE/rpc_server srv_ns1 service_2 tcp
+ip netns exec ns1 ./CLI_SERV_SOURCE/rpc_server srv_ns1 service_2 $1
 sleep 2
 
 echo "Test connections: ns1 - service2, ns2 - service1"
@@ -35,7 +37,7 @@ echo "Test connections: ns1 - service2, ns2 - service1"
 ./CLI_SERV_SOURCE/rpc_client 192.168.16.136 service_1 "client from ns2 - service_1"
 
 echo "Run service3 in ns1"
-ip netns exec ns1 ./CLI_SERV_SOURCE/rpc_server srv_ns1 service_3 tcp
+ip netns exec ns1 ./CLI_SERV_SOURCE/rpc_server srv_ns1 service_3 $1
 sleep 2
 
 echo "Test connections: ns1 - service2, ns1 - service3, ns2 - service1"
@@ -57,7 +59,7 @@ python Agents/vethconf.py -ns ns2 192.168.16.136
 ./Agents/nsconfig.sh ns2 start
 
 echo "Run service2 in ns2"
-ip netns exec ns2 ./CLI_SERV_SOURCE/rpc_server srv_ns2 service_2 tcp 
+ip netns exec ns2 ./CLI_SERV_SOURCE/rpc_server srv_ns2 service_2 $1 
 
 echo "Test connections: ns1 - service2, ns1 - service3, ns2 - service2"
 ./CLI_SERV_SOURCE/rpc_client 192.168.16.135 service_2 "client from ns1 - service_2"
@@ -69,3 +71,6 @@ echo "End test, stop everything"
 ./Agents/nsconfig.sh ns1 stop
 ./Agents/nsconfig.sh ns2 stop
 
+echo "Delete configuration"
+ip link del brns1
+ip link del brns2
