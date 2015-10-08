@@ -2,4 +2,4 @@ For 2-namespaces system configuration(run from superuser):
 ./TestCases/2ns_test/[test_1/test_2].sh [udp/tcp/all]
 
 For 3-namespaces system configuration(run from superuser):
-./TestCases/3ns_test/test_2.sh [udp/tcp/all]
+./TestCases/3ns_test/test_1.sh [udp/tcp/all]
