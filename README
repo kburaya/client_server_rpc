@@ -1,7 +1,5 @@
-To run test suite:
-write to file TestCases/config.xml test-environment configuration - [script = "StorageArray_2ns.xml"/script = "StorageArray_3ns.xml"]
+For 2-namespaces system configuration(run from superuser):
+./TestCases/2ns_test/[test_1/test_2].sh [udp/tcp/all]
 
-run in console(in sudo mode):
-python TestCases/config.xml
-./TestCases/2ns_test/test_1.sh #for 2namespace test
-./TestCases/3ns_test/test_1.sh #for 3namespace test
+For 3-namespaces system configuration(run from superuser):
+./TestCases/3ns_test/test_2.sh [udp/tcp/all]
