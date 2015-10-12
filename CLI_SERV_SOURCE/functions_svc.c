@@ -212,7 +212,7 @@ main (int argc, char **argv)
 		}
 	}
 
-	else if((strcmp(protocol, "tcp") == 0) || (strcmp(protocol, "all") == 0))  {
+	if((strcmp(protocol, "tcp") == 0) || (strcmp(protocol, "all") == 0))  {
 		transp = svctcp_create(RPC_ANYSOCK, 0, 0);
 		if (transp == NULL) {
 			fprintf (stderr, "%s", "cannot create tcp service.");
